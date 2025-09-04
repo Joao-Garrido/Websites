@@ -1,586 +1,754 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calculadora de Juros Compostos + IPCA</title>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Juros Compostos + IPCA — PRO</title>
+
+<!-- Chart.js + annotation plugin -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+
+<!-- Fonte e estilo -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --bg:#0b132b; --card:#1c2541; --muted:#3a506b; --acc:#5bc0be; --acc2:#ffd166; --text:#eaf4f4; --ok:#06d6a0; --warn:#ef476f;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#101936);}
-  header{padding:28px 18px;text-align:center;color:var(--text)}
-  header h1{margin:0 0 6px;font-size:28px;letter-spacing:.3px}
-  header p{margin:0;opacity:.85}
+:root{
+  /* dark convidativo (da primeira versão, com retoques) */
+  --bg:#0b132b; --card:#141d3a; --muted:#8fa7cf;
+  --line:#243055; --text:#eaf4ff;
+  --acc:#26b6bd; --acc2:#ffd166; --ok:#06d6a0; --warn:#ef476f;
+  --blue:#5ea0ff; --orange:#ff9f43; --green:#46d39a; --violet:#a38bff; --grey:#93a5c4;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:linear-gradient(180deg,var(--bg),#0f1736);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+header{padding:26px 16px 10px;text-align:center}
+h1{margin:0;font-size:28px;font-weight:800;letter-spacing:.2px}
+.sub{opacity:.85;margin-top:6px}
 
-  .wrap{max-width:1200px;margin:18px auto;padding:0 18px 40px;display:grid;grid-template-columns: 360px 1fr;gap:18px}
-  @media (max-width:1024px){.wrap{grid-template-columns:1fr}}
-  .card{background:var(--card);color:var(--text);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);border:1px solid #243055}
-  .card h2{margin:0;padding:16px 16px 0;font-size:18px}
-  .card .content{padding:16px}
+.wrap{max-width:1250px;margin:0 auto;padding:0 16px 40px;display:grid;grid-template-columns:410px 1fr;gap:16px}
+@media (max-width:1100px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(0,0,0,.35)}
+.card h2{margin:0;padding:14px 14px 0;font-size:16px}
+.card .content{padding:14px}
 
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .grid-1{grid-template-columns:1fr}
-  .grid-3{grid-template-columns:1fr 1fr 1fr}
-  label{font-size:12px;opacity:.85}
-  input, select{width:100%;margin-top:6px;padding:10px 12px;border-radius:10px;border:1px solid #2b375f;background:#121a32;color:var(--text);outline:none}
-  input:focus{border-color:#4f78ff;box-shadow:0 0 0 3px rgba(79,120,255,.15)}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{cursor:pointer;border:0;border-radius:12px;padding:11px 14px;font-weight:700;letter-spacing:.2px;background:var(--acc);color:#072a2a}
-  .btn.secondary{background:#223055;color:#cfe9ff;border:1px solid #2d3b66}
-  .btn.warn{background:var(--warn);color:#FFF}
-  .btn.ok{background:var(--ok);color:#052a22}
-  .note{font-size:12px;opacity:.85}
-  .chip{display:inline-flex;align-items:center;gap:8px;background:#0e1a36;border:1px solid #2c3b6c;color:#cfe4ff;border-radius:999px;padding:6px 10px;font-size:12px}
-  .chip .x{cursor:pointer;color:#ff7a7a;font-weight:700}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g1{grid-template-columns:1fr}
+@media (max-width:600px){.g2,.g3{grid-template-columns:1fr}}
 
-  /* Summary */
-  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
-  .kpi{background:#0f1934;border:1px solid #21305b;border-radius:12px;padding:12px}
-  .kpi .label{font-size:12px;opacity:.7}
-  .kpi .val{font-size:20px;font-weight:700;margin-top:6px}
-  .kpi .sub{font-size:12px;opacity:.75;margin-top:4px}
+label{font-size:12px;color:var(--muted)}
+input,select,textarea{
+  width:100%;margin-top:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);
+  background:#0e1630;color:var(--text);outline:none;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{border-color:#4f78ff;box-shadow:0 0 0 3px rgba(79,120,255,.2)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;background:var(--acc);color:#042f31}
+.btn:hover{filter:brightness(.95)}
+.btn.ghost{background:#0e1630;color:#cfe4ff;border:1px solid var(--line)}
+.btn.alt{background:var(--ok);color:#062b20}
+.btn.warn{background:var(--warn);color:#fff}
+.small{font-size:12px;opacity:.9}
+.hr{border:1px solid var(--line);border-bottom:0;margin:14px 0}
 
-  /* Chart */
-  .chart-card{padding:10px 12px 18px}
-  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-  .legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.kpi{background:#0e1630;border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi .l{font-size:12px;color:var(--muted)}
+.kpi .v{font-size:20px;font-weight:800;margin-top:4px}
+.kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
 
-  /* Table */
-  .table-wrap{overflow:auto;max-height:420px;border-top:1px solid #223055}
-  table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
-  thead th{position:sticky;top:0;background:#0e1832;border-bottom:1px solid #223055;padding:10px 8px;text-align:left;font-size:12px}
-  tbody td{border-bottom:1px dashed #223055;padding:8px;text-align:right;font-variant-numeric:tabular-nums}
-  tbody tr:nth-child(odd){background:#0c1731}
-  tfoot td{position:sticky;bottom:0;background:#0e1832;border-top:1px solid #223055;padding:10px 8px;font-weight:700}
-  .left{text-align:left}
-  .right{text-align:right}
+/* instrumentos */
+table.inst{width:100%;border-collapse:separate;border-spacing:0}
+table.inst th, table.inst td{padding:6px 6px;border-bottom:1px dashed var(--line);font-size:12px;text-align:left}
+table.inst thead th{position:sticky;top:0;background:#0e1630;border-bottom:1px solid var(--line)}
+.del{cursor:pointer;color:#ff8d8d;font-weight:800}
 
-  .footer{max-width:1200px;margin:20px auto;color:#c9d6ff;opacity:.9;font-size:12px;padding:0 18px}
-  a, a:visited{color:#9ad7ff}
+/* chart */
+.chart-box{padding:8px 12px}
+canvas{width:100%;height:380px !important}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:6px}
+
+/* tabela anual */
+.table-wrap{overflow:auto;max-height:440px;border-top:1px solid var(--line)}
+table.annual{width:100%;border-collapse:separate;border-spacing:0;min-width:980px}
+table.annual thead th{position:sticky;top:0;background:#0e1630;border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;font-size:12px}
+table.annual tbody td{border-bottom:1px dashed var(--line);padding:8px;text-align:right}
+table.annual tbody tr:nth-child(odd){background:#0c1531}
+.left{text-align:left}
+
+.footer{max-width:1250px;margin:22px auto;color:var(--muted);font-size:12px;padding:0 16px}
 </style>
 </head>
 <body>
-  <header>
-    <h1>Calculadora de Juros Compostos + IPCA</h1>
-    <p>Aportes sobem no início de cada ano pela <b>média IPCA (20 anos)</b>, juros compostos com taxa anual separada do IPCA. ✨</p>
-  </header>
+<header>
+  <h1>Calculadora de Juros Compostos + IPCA — PRO</h1>
+  <div class="sub">Aportes sobem no início de cada ano pelo IPCA projetado. Títulos com vencimento, IR conforme regra, reinvestimento opcional. Metas e linhas-guia no gráfico. ✨</div>
+</header>
 
-  <div class="wrap">
-    <!-- Painel de entradas -->
-    <section class="card">
-      <h2>Parâmetros</h2>
-      <div class="content">
-        <div class="grid">
-          <div>
-            <label>Valor inicial (R$)
-              <input type="number" id="valorInicial" value="10000" min="0" step="0.01" />
-            </label>
-          </div>
-          <div>
-            <label>Aporte mensal base (R$)
-              <input type="number" id="aporteMensal" value="500" min="0" step="0.01" />
-            </label>
-          </div>
-          <div>
-            <label>Taxa de juros anual (% a.a.)
-              <input type="number" id="jurosAnual" value="10" min="0" step="0.01" />
-            </label>
-          </div>
-          <div>
-            <label>Duração (anos)
-              <input type="number" id="anos" value="20" min="1" step="1" />
-            </label>
-          </div>
-        </div>
-
-        <hr style="border-color:#223055;border-style:solid;border-width:1px;margin:16px 0;opacity:.6">
-
-        <div class="grid">
-          <div>
-            <label>IPCA médio (20 anos) — geométrico (% a.a.)
-              <input type="number" id="ipcaMedioInput" step="0.01" placeholder="Clique em Buscar IPCA" />
-            </label>
-            <div class="note">Se preferir, altere manualmente após buscar.</div>
-          </div>
-          <div class="row" style="align-items:end">
-            <button class="btn" id="btnBuscarIPCA">🔎 Buscar IPCA (20 anos)</button>
-            <button class="btn secondary" id="btnUsarPadrao" title="Define 5% a.a. como IPCA médio">Usar 5% a.a.</button>
-          </div>
-        </div>
-        <div class="note" id="ipcaFonte"></div>
-
-        <hr style="border-color:#223055;border-style:solid;border-width:1px;margin:16px 0;opacity:.6">
-
-        <h3 style="margin:0 0 8px;font-size:14px">Cortes (opcionais)</h3>
-        <div class="note" style="margin-bottom:8px">
-          Defina um <b>ano de corte</b> (ex.: 5 = início do ano 5) para trocar a <i>taxa anual</i> e/ou o <i>aporte base</i>.
-          O aporte continua crescendo pelos IPCA dos anos seguintes.
-        </div>
-        <div class="grid-3 grid" style="margin-bottom:8px">
-          <div>
-            <label>Ano do corte
-              <input type="number" id="corteAno" min="1" step="1" placeholder="ex.: 5" />
-            </label>
-          </div>
-          <div>
-            <label>Nova taxa anual (% a.a.)
-              <input type="number" id="corteTaxa" step="0.01" placeholder="opcional" />
-            </label>
-          </div>
-          <div>
-            <label>Novo aporte base (R$)
-              <input type="number" id="corteAporte" step="0.01" placeholder="opcional" />
-            </label>
-          </div>
-        </div>
-        <div class="row">
-          <button class="btn ok" id="btnAddCorte">+ Adicionar corte</button>
-          <button class="btn secondary" id="btnLimparCortes">Limpar cortes</button>
-        </div>
-        <div class="row" id="cortesChips" style="margin-top:8px"></div>
-
-        <hr style="border-color:#223055;border-style:solid;border-width:1px;margin:16px 0;opacity:.6">
-
-        <div class="row">
-          <button class="btn" id="btnCalcular">▶️ Calcular simulação</button>
-          <button class="btn secondary" id="btnCSV">⤓ Baixar CSV</button>
-        </div>
+<div class="wrap">
+  <!-- Painel -->
+  <section class="card">
+    <h2>Parâmetros</h2>
+    <div class="content">
+      <div class="grid g2">
+        <div><label>Valor inicial (R$)
+          <input type="number" id="valorInicial" value="10000" min="0" step="0.01"></label></div>
+        <div><label>Aporte mensal base (R$)
+          <input type="number" id="aporteMensal" value="800" min="0" step="0.01"></label></div>
+        <div><label>Duração (anos)
+          <input type="number" id="anos" value="20" min="1" step="1"></label></div>
+        <div><label>Taxa de administração anual (%)
+          <input type="number" id="taxaAdm" value="0.5" min="0" step="0.01"></label></div>
       </div>
-    </section>
 
-    <!-- Resultados -->
-    <section class="card chart-card">
-      <div class="content">
-        <h2>Resultados</h2>
-        <div class="summary">
-          <div class="kpi">
-            <div class="label">Total investido</div>
-            <div class="val" id="kpiInvestido">R$ 0,00</div>
-            <div class="sub">Inicial + aportes</div>
+      <div class="hr"></div>
+
+      <h3 style="margin:4px 0 8px;font-size:14px">Inflação (IPCA)</h3>
+      <div class="grid g1">
+        <div class="row" style="justify-content:space-between">
+          <label style="flex:1">IPCA médio (20 anos) — geométrico (% a.a.)
+            <input type="number" id="ipcaMedioInput" placeholder="Clique em Buscar IPCA" step="0.01">
+          </label>
+          <button class="btn" id="btnBuscarIPCA" title="Bacen/SGS 433">🔎 Buscar IPCA</button>
+          <button class="btn ghost" id="btnUsar5">Usar 5% a.a.</button>
+        </div>
+        <div id="ipcaFonte" class="small"></div>
+        <div class="grid g2">
+          <div>
+            <label>Modelo de projeção</label>
+            <select id="projModelo">
+              <option value="const">Constante (usa IPCA médio)</option>
+              <option value="reversao">Reversão à meta</option>
+              <option value="custom">Personalizada (por ano)</option>
+            </select>
           </div>
-          <div class="kpi">
-            <div class="label">Juros acumulados</div>
-            <div class="val" id="kpiJuros">R$ 0,00</div>
-            <div class="sub">Diferença para o saldo</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Saldo final</div>
-            <div class="val" id="kpiSaldo">R$ 0,00</div>
-            <div class="sub">Ao fim do período</div>
+          <div class="row" id="boxReversao" style="display:none">
+            <label style="flex:1">Meta IPCA (% a.a.)<input type="number" id="projMeta" value="3" step="0.1"></label>
+            <label style="flex:1">Horizonte (anos)<input type="number" id="projHorizonte" value="5" min="1" step="1"></label>
           </div>
         </div>
-
-        <div style="margin-top:12px">
-          <canvas id="chart" height="120"></canvas>
-          <div class="legend">
-            <span><span class="sw" style="background:var(--acc)"></span>Investido</span>
-            <span><span class="sw" style="background:var(--acc2)"></span>Saldo (com juros)</span>
-            <span><span class="sw" style="background:linear-gradient(90deg,#06d6a0,#40f1c9)"></span>Juros acumulados</span>
-          </div>
+        <div id="boxCustom" style="display:none">
+          <label>IPCA por ano (% a.a.; vazio = projeção padrão)</label>
+          <textarea id="projLista" rows="3" placeholder="Ex.: 5;4.8;4.5;4.2;4;3.8"></textarea>
+          <div class="small">Valores aplicam-se a partir do Ano 2.</div>
         </div>
       </div>
 
-      <div class="table-wrap">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th class="left">Mês</th>
-              <th class="right">Saldo início</th>
-              <th class="right">Aporte do mês</th>
-              <th class="right">Juros do mês</th>
-              <th class="right">Saldo final</th>
-              <th class="right">Aporte base do ano</th>
-              <th class="right">Taxa anual vigente</th>
-              <th class="right">Corte?</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-          <tfoot>
-            <tr>
-              <td class="left">Totais</td>
-              <td></td>
-              <td id="ftAportes" class="right"></td>
-              <td id="ftJuros" class="right"></td>
-              <td id="ftSaldo" class="right"></td>
-              <td colspan="3"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </section>
-  </div>
+      <div class="hr"></div>
 
-  <div class="footer">
-    <p>
-      Fonte do IPCA (20 anos): série <b>SGS 433 - IPCA, variação mensal (%)</b>, via API pública do Banco Central do Brasil. A média usada aqui é a
-      <i>geométrica anualizada</i>, calculada sobre os últimos 240 meses disponíveis. Veja notas abaixo.
-    </p>
-    <p class="note">
-      Observações: depósitos mensais são considerados no <b>início de cada mês</b>; o aporte mensal é atualizado no <b>início de cada ano</b> pela média de IPCA; cortes aplicam-se no início do ano indicado.
-    </p>
-  </div>
+      <h3 style="margin:4px 0 8px;font-size:14px">Cortes (opcionais)</h3>
+      <div class="grid g3">
+        <div><label>Ano do corte
+          <input type="number" id="corteAno" min="1" step="1" placeholder="ex.: 5"></label></div>
+        <div><label>Novo aporte base (R$)
+          <input type="number" id="corteAporte" step="0.01" placeholder="opcional"></label></div>
+        <div><label>(Opcional) Nota<br>
+          <input type="text" id="corteNota" placeholder="ex.: bônus, promoção etc."></label></div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn alt" id="btnAddCorte">+ Adicionar corte</button>
+        <button class="btn ghost" id="btnLimparCortes">Limpar cortes</button>
+      </div>
+      <div class="row" id="cortesChips" style="margin-top:8px"></div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:4px 0 8px;font-size:14px">Metas de patrimônio (linhas-guia)</h3>
+      <div class="grid g2">
+        <div><label>Ano da meta
+          <input type="number" id="metaAno" min="1" step="1" placeholder="ex.: 10"></label></div>
+        <div><label>Valor alvo (R$)
+          <input type="number" id="metaValor" step="0.01" placeholder="ex.: 500000"></label></div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn alt" id="btnAddMeta">+ Adicionar meta</button>
+        <button class="btn ghost" id="btnLimparMetas">Limpar metas</button>
+      </div>
+      <div class="row" id="metasChips" style="margin-top:8px"></div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:4px 0 8px;font-size:14px">Títulos (CDB, LCI, LCA)</h3>
+      <div class="small" style="margin-bottom:6px">Alocação é aplicada sobre cada aporte mensal. No vencimento, juros do CDB têm IR regressivo (<=180d 22,5%; 181–360d 20%; 361–720d 17,5%; >720d 15%). LCI/LCA são isentos.</div>
+      <table class="inst" id="instTable">
+        <thead>
+          <tr><th>Tipo</th><th>Taxa (% a.a.)</th><th>Vencimento (anos)</th><th>Alocação (%)</th><th>Reinvestir?</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="row" style="margin-top:6px">
+        <button class="btn alt" id="btnAddInst">+ Adicionar título</button>
+        <button class="btn ghost" id="btnExemplo">Exemplo (CDB 100%)</button>
+      </div>
+      <div class="small" id="alocMsg"></div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <button class="btn" id="btnCalcular">▶️ Calcular</button>
+        <button class="btn ghost" id="btnCSV">⤓ CSV</button>
+        <button class="btn ghost" id="btnPNG">⤓ PNG</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resultados -->
+  <section class="card">
+    <div class="content">
+      <h2>Resultados</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="l">Total investido</div><div class="v" id="kpiInvestido">R$ 0,00</div><div class="s">Inicial + aportes</div></div>
+        <div class="kpi"><div class="l">Juros líquidos</div><div class="v" id="kpiJuros">R$ 0,00</div><div class="s">Após IR e taxa adm</div></div>
+        <div class="kpi"><div class="l">Saldo final (nominal)</div><div class="v" id="kpiSaldo">R$ 0,00</div><div class="s">Ao fim do período</div></div>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="chart"></canvas>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--blue)"></span>Investido</span>
+          <span><span class="sw" style="background:var(--orange)"></span>Saldo (nominal)</span>
+          <span><span class="sw" style="background:var(--green)"></span>Saldo (R$ de hoje)</span>
+          <span><span class="sw" style="background:var(--violet)"></span>Poder de compra (índice)</span>
+          <span><span class="sw" style="background:var(--acc2)"></span>Metas / Cortes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="annual" id="tbl">
+        <thead>
+          <tr>
+            <th class="left">Ano</th>
+            <th>Saldo início</th>
+            <th>Aporte do ano</th>
+            <th>Juros do ano (líq.)</th>
+            <th>IR pago</th>
+            <th>Taxa Adm</th>
+            <th>Saldo final</th>
+            <th>Saldo (R$ de hoje)</th>
+            <th>Aporte base do ano</th>
+            <th>IPCA do ano</th>
+            <th>Corte?</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<div class="footer">
+  <p>Botão “Buscar IPCA” usa <b>SGS 433 (IPCA mensal %)</b> da API pública do Bacen. Média usada: <i>geométrica anualizada</i> dos últimos 240 meses. Aporte é reajustado no início de cada ano. CDB: IR regressivo no vencimento; LCI/LCA: isentos (pessoa física). Esta é uma simulação educacional.</p>
+</div>
 
 <script>
-/** ==========================
- *  Utilidades de formatação
- *  ========================== */
-const fmtBRL = v => (v ?? 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const fmtPct = v => `${(v*100).toFixed(2)}%`;
-const toNumber = el => parseFloat(el.value.replace(',', '.')) || 0;
+/* ======= Utils ======= */
+const brl = v => (v??0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const toNum = el => parseFloat(String(el.value).replace(',','.'))||0;
 
-/** ==========================
- *  Estado / elementos
- *  ========================== */
-const el = {
-  valorInicial: document.querySelector('#valorInicial'),
-  aporteMensal: document.querySelector('#aporteMensal'),
-  jurosAnual: document.querySelector('#jurosAnual'),
-  anos: document.querySelector('#anos'),
-  ipcaMedioInput: document.querySelector('#ipcaMedioInput'),
-  btnBuscarIPCA: document.querySelector('#btnBuscarIPCA'),
-  btnUsarPadrao: document.querySelector('#btnUsarPadrao'),
-  ipcaFonte: document.querySelector('#ipcaFonte'),
+/* ======= Elements ======= */
+const E = {
+  valorInicial: q('#valorInicial'),
+  aporteMensal: q('#aporteMensal'),
+  anos: q('#anos'),
+  taxaAdm: q('#taxaAdm'),
+  ipcaMedioInput: q('#ipcaMedioInput'),
+  btnBuscarIPCA: q('#btnBuscarIPCA'),
+  btnUsar5: q('#btnUsar5'),
+  ipcaFonte: q('#ipcaFonte'),
+  projModelo: q('#projModelo'),
+  projMeta: q('#projMeta'),
+  projHorizonte: q('#projHorizonte'),
+  projLista: q('#projLista'),
+  boxReversao: q('#boxReversao'),
+  boxCustom: q('#boxCustom'),
   // cortes
-  corteAno: document.querySelector('#corteAno'),
-  corteTaxa: document.querySelector('#corteTaxa'),
-  corteAporte: document.querySelector('#corteAporte'),
-  btnAddCorte: document.querySelector('#btnAddCorte'),
-  btnLimparCortes: document.querySelector('#btnLimparCortes'),
-  cortesChips: document.querySelector('#cortesChips'),
-  // ações
-  btnCalcular: document.querySelector('#btnCalcular'),
-  btnCSV: document.querySelector('#btnCSV'),
+  corteAno: q('#corteAno'),
+  corteAporte: q('#corteAporte'),
+  corteNota: q('#corteNota'),
+  btnAddCorte: q('#btnAddCorte'),
+  btnLimparCortes: q('#btnLimparCortes'),
+  cortesChips: q('#cortesChips'),
+  // metas
+  metaAno: q('#metaAno'),
+  metaValor: q('#metaValor'),
+  btnAddMeta: q('#btnAddMeta'),
+  btnLimparMetas: q('#btnLimparMetas'),
+  metasChips: q('#metasChips'),
+  // inst
+  instTable: q('#instTable tbody'),
+  btnAddInst: q('#btnAddInst'),
+  btnExemplo: q('#btnExemplo'),
+  alocMsg: q('#alocMsg'),
+  // actions
+  btnCalcular: q('#btnCalcular'),
+  btnCSV: q('#btnCSV'),
+  btnPNG: q('#btnPNG'),
   // KPIs
-  kpiInvestido: document.querySelector('#kpiInvestido'),
-  kpiJuros: document.querySelector('#kpiJuros'),
-  kpiSaldo: document.querySelector('#kpiSaldo'),
-  // tabela
-  tblBody: document.querySelector('#tbl tbody'),
-  ftAportes: document.querySelector('#ftAportes'),
-  ftJuros: document.querySelector('#ftJuros'),
-  ftSaldo: document.querySelector('#ftSaldo'),
-  // chart
-  chartCanvas: document.querySelector('#chart')
+  kpiInvestido: q('#kpiInvestido'),
+  kpiJuros: q('#kpiJuros'),
+  kpiSaldo: q('#kpiSaldo'),
+  // chart & table
+  chartEl: q('#chart'),
+  tblBody: q('#tbl tbody'),
 };
+function q(s){return document.querySelector(s)}
 
-let cortes = [];   // { ano: number, taxa?: number, aporte?: number }
+/* ======= State ======= */
+let cortes = []; // {ano, novoAporte?, nota?}
+let metas = [];  // {ano, valor}
+let instId = 0;  // incremental
 let chart;
 
-/** ==========================
- *  IPCA (SGS 433 - Bacen)
- *  ========================== */
-async function buscarIPCAGeometrico20Anos() {
-  // Endpoint: dados de toda a série; usaremos os últimos 240 meses.
-  // Ex.: https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json
-  const url = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json';
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Falha ao buscar IPCA no Bacen');
-  const all = await res.json(); // [{data:'01/1980', valor:'x.xx'}, ...]
-  if (!Array.isArray(all) || all.length < 240) throw new Error('Série IPCA insuficiente');
-
+/* ======= IPCA (SGS 433 Bacen) ======= */
+async function buscarIPCAGeometrico20Anos(){
+  const url='https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json';
+  const r = await fetch(url,{cache:'no-store'});
+  if(!r.ok) throw new Error('Falha ao buscar IPCA');
+  const all = await r.json();
+  if(!Array.isArray(all) || all.length<240) throw new Error('Série insuficiente');
   const last240 = all.slice(-240);
-  const monthlyRates = last240.map(d => parseFloat(String(d.valor).replace(',', '.')) / 100); // p.ex. 0.0034
-  // Média geométrica anualizada:
-  // produto dos (1 + taxa_mensal) ^ (12 / 240) - 1
-  const product = monthlyRates.reduce((acc, r) => acc * (1 + r), 1);
-  const annualized = Math.pow(product, 12 / monthlyRates.length) - 1;
-
-  // datas de referência
-  const inicio = last240[0]?.data ?? '';
-  const fim = last240[last240.length - 1]?.data ?? '';
-  return { ipcaAnualGeometrico: annualized, inicio, fim };
+  const monthly = last240.map(d => parseFloat(String(d.valor).replace(',','.'))/100);
+  const product = monthly.reduce((a,x)=>a*(1+x),1);
+  const annual = Math.pow(product,12/monthly.length)-1;
+  return {annual, inicio:last240[0]?.data, fim:last240.at(-1)?.data};
 }
 
-/** ==========================
- *  Cortes (UI)
- *  ========================== */
-function renderCortes() {
-  el.cortesChips.innerHTML = '';
-  if (!cortes.length) {
-    const p = document.createElement('div');
-    p.className = 'note';
-    p.textContent = 'Nenhum corte adicionado.';
-    el.cortesChips.appendChild(p);
-    return;
+/* ======= Projeção de IPCA por ano ======= */
+function montarIPCAAnual(anos, ipcaMedio){
+  const modelo = E.projModelo.value;
+  const out = new Array(anos).fill(ipcaMedio);
+  if(modelo==='reversao'){
+    const meta = Math.max(-0.99, toNum(E.projMeta)/100);
+    const H = Math.max(1, Math.floor(toNum(E.projHorizonte)));
+    for(let a=2;a<=anos;a++){
+      const t = Math.min(1,(a-2)/(H-1||1));
+      out[a-1] = ipcaMedio*(1-t) + meta*t;
+    }
+  }else if(modelo==='custom'){
+    const raw = E.projLista.value.split(';').map(s=>parseFloat(s.replace(',','.'))/100).filter(x=>!Number.isNaN(x));
+    for(let i=0;i<raw.length && (i+1)<anos;i++) out[i+1]=raw[i];
   }
-  cortes.sort((a,b)=>a.ano - b.ano);
-  cortes.forEach((c, idx) => {
-    const wrap = document.createElement('span');
-    wrap.className = 'chip';
-    const parts = [];
-    parts.push(`Ano ${c.ano}`);
-    if (typeof c.taxa === 'number') parts.push(`Juros ${c.taxa.toFixed(2)}%`);
-    if (typeof c.aporte === 'number') parts.push(`Aporte ${fmtBRL(c.aporte)}`);
-    wrap.innerHTML = parts.join(' • ') + ` <span class="x" title="remover" data-idx="${idx}">×</span>`;
-    el.cortesChips.appendChild(wrap);
+  return out; // out[a-1] = IPCA do ano a
+}
+
+/* ======= Instrumentos UI ======= */
+function addInstRow(data){
+  const tr = document.createElement('tr');
+  const id = ++instId;
+  tr.dataset.id = id;
+  tr.innerHTML = `
+    <td>
+      <select class="tipo">
+        <option value="CDB"${data?.tipo==='CDB'?' selected':''}>CDB</option>
+        <option value="LCI"${data?.tipo==='LCI'?' selected':''}>LCI</option>
+        <option value="LCA"${data?.tipo==='LCA'?' selected':''}>LCA</option>
+      </select>
+    </td>
+    <td><input type="number" class="taxa" step="0.01" value="${data?.taxa ?? 12}"></td>
+    <td><input type="number" class="vcto" step="0.1" value="${data?.vcto ?? 2}"></td>
+    <td><input type="number" class="aloc" step="0.01" value="${data?.aloc ?? 100}"></td>
+    <td style="text-align:center"><input type="checkbox" class="reinv"${(data?.reinv ?? true)?' checked':''}></td>
+    <td><span class="del" title="remover">×</span></td>
+  `;
+  tr.querySelector('.del').addEventListener('click',()=>{ tr.remove(); validarAlocacao(); });
+  ['input','change'].forEach(evt => tr.addEventListener(evt, validarAlocacao));
+  E.instTable.appendChild(tr);
+  validarAlocacao();
+}
+function readInstRows(){
+  const rows = Array.from(E.instTable.querySelectorAll('tr'));
+  return rows.map(tr=>{
+    const tipo = tr.querySelector('.tipo').value;
+    const taxa = parseFloat(tr.querySelector('.taxa').value)||0;
+    const vcto = parseFloat(tr.querySelector('.vcto').value)||1;
+    const aloc = parseFloat(tr.querySelector('.aloc').value)||0;
+    const reinv = tr.querySelector('.reinv').checked;
+    return {tipo, taxa, vcto, aloc, reinv};
   });
-  // remover
-  el.cortesChips.querySelectorAll('.x').forEach(x=>{
-    x.addEventListener('click', (e)=>{
-      const i = Number(e.target.getAttribute('data-idx'));
-      cortes.splice(i,1);
-      renderCortes();
-    });
+}
+function validarAlocacao(){
+  const inst = readInstRows();
+  const total = inst.reduce((s,i)=>s+(i.aloc||0),0);
+  let msg = `Alocação total: ${total.toFixed(2)}%`;
+  if(total>100) msg += ' • ⚠️ acima de 100% — ajuste!';
+  if(total<100) msg += ' • restante vai para “Caixa” (rendendo 0% nominal).';
+  E.alocMsg.textContent = msg;
+}
+
+/* ======= Cortes / Metas UI ======= */
+function renderChips(container, list, labelFn, onDel){
+  container.innerHTML='';
+  if(!list.length){
+    const p=document.createElement('div'); p.className='small'; p.textContent='Nenhum item.'; container.appendChild(p); return;
+  }
+  list.forEach((x,i)=>{
+    const span = document.createElement('span');
+    span.className='small';
+    span.style.cssText='display:inline-flex;gap:8px;align-items:center;background:#0e1630;border:1px dashed var(--line);padding:6px 10px;border-radius:999px;margin-right:6px;margin-bottom:6px';
+    span.innerHTML = `${labelFn(x)} <span class="del" data-i="${i}">×</span>`;
+    container.appendChild(span);
+  });
+  container.querySelectorAll('.del').forEach(d=>{
+    d.addEventListener('click', e=>{ const i=Number(e.target.dataset.i); onDel(i); });
   });
 }
 
-/** ==========================
- *  Simulação mensal
- *  ========================== */
-function simular() {
-  const anos = Math.max(1, Math.floor(toNumber(el.anos)));
-  const meses = anos * 12;
+function renderCortes(){ renderChips(E.cortesChips, cortes, c => `Ano ${c.ano} • Aporte ${c.novoAporte?brl(c.novoAporte):'—'}${c.nota?` • ${c.nota}`:''}`, i => { cortes.splice(i,1); renderCortes(); }); }
+function renderMetas(){ renderChips(E.metasChips, metas, m => `Meta ano ${m.ano}: ${brl(m.valor)}`, i => { metas.splice(i,1); renderMetas(); }); }
 
-  let saldo = toNumber(el.valorInicial);
-  let aporteBaseAno = toNumber(el.aporteMensal);
-  let taxaAnualVigente = toNumber(el.jurosAnual) / 100;
-  const ipcaMedio = (parseFloat(el.ipcaMedioInput.value.replace(',', '.')) || 0) / 100;
+/* ======= IR Regressivo (CDB) ======= */
+function irCdbAliquota(prazoMeses){
+  if(prazoMeses<=6*30/30){} // noop, tabela é por dias, usaremos meses equivalentes
+  const d = prazoMeses*30; // aproximando 30d/mês
+  if(d<=180) return 0.225;
+  if(d<=360) return 0.20;
+  if(d<=720) return 0.175;
+  return 0.15;
+}
 
-  // validações leves
-  if (ipcaMedio <= -1) { alert('IPCA médio inválido.'); return; }
+/* ======= Simulação ======= */
+function simular(){
+  const anos = Math.max(1, Math.floor(toNum(E.anos)));
+  const meses = anos*12;
+  const aporteMensalBaseIni = toNum(E.aporteMensal);
+  const taxaAdmAnual = Math.max(0, toNum(E.taxaAdm)/100);
+  const taxaAdmMensal = taxaAdmAnual/12; // aprox. linear
 
-  // preparar cortes por ano para acesso rápido
-  const cortesMap = new Map(); // ano -> {taxa?, aporte?}
-  cortes.forEach(c => { if (c.ano >= 1 && c.ano <= anos) cortesMap.set(c.ano, c); });
+  const ipcaMedio = (parseFloat(E.ipcaMedioInput.value?.replace(',','.'))||0)/100;
+  const ipcaPorAno = montarIPCAAnual(anos, ipcaMedio);
 
-  // datas humanizadas iniciando no ano corrente (mas só usamos rótulos)
-  const startDate = new Date();
-  const labels = [];
-  const rows = [];
+  const inst = readInstRows();
+  const alocTotal = inst.reduce((s,i)=>s+(i.aloc||0),0);
+  const alocFrac = inst.map(i=>({...i, frac:(i.aloc||0)/100}));
+  const caixaFrac = Math.max(0, 1 - alocTotal/100); // rende 0% nominal (caixa inerte)
 
+  let saldoCaixa = 0; // sem IR
+  let saldo = toNum(E.valorInicial);
   let investidoAportes = 0;
-  const investidoSerie = []; // acumulado: inicial + aportes até o mês
-  const saldoSerie = [];
-  const jurosAcumSerie = [];
 
-  // controle de início de ano
-  // mês 0..meses-1, anoAtual = Math.floor(m/12) + 1; mêsNoAno = (m % 12) + 1
-  for (let m = 0; m < meses; m++) {
-    const anoAtual = Math.floor(m/12) + 1;
-    const mesNoAno = (m % 12) + 1;
+  // Lotes por instrumento (com vencimento)
+  const lotes = []; // {tipo, principal, principalIni, mesesRest, taxaAnual, prazoMeses, reinv}
 
-    // início do ano: aplicar IPCA no aporte base e cortes (ordem: cortes sobrescrevem, depois segue IPCA só nos próximos anos)
-    if (mesNoAno === 1) {
-      // aplicar corte antes: ele define a base para este ano
-      if (cortesMap.has(anoAtual)) {
-        const c = cortesMap.get(anoAtual);
-        if (typeof c.aporte === 'number' && !Number.isNaN(c.aporte)) {
-          aporteBaseAno = c.aporte;
+  // se valor inicial: joga para caixa (simples) — poderia distribuir, mas manteremos claro
+  saldoCaixa += toNum(E.valorInicial);
+
+  // agregadores anuais
+  const rowsAno=[]; const xLabels=[];
+  const serieInvestido=[]; const serieSaldoNominal=[]; const serieSaldoReal=[]; const seriePoderCompraIdx=[];
+  let jurosAno=0, irAno=0, admAno=0;
+  let aporteBaseAno = aporteMensalBaseIni;
+
+  // helper para aplicar taxa adm proporcional nos lotes + caixa
+  function aplicarTaxaAdm(){
+    // reduzir proporcionalmente: aplicar em caixa e todos os lotes
+    const totalAntes = saldoCaixa + lotes.reduce((s,l)=>s+l.principal,0);
+    if(totalAntes<=0 || taxaAdmMensal<=0) return 0;
+    const custo = totalAntes * taxaAdmMensal;
+    const fator = 1 - taxaAdmMensal;
+    saldoCaixa *= fator;
+    lotes.forEach(l=>{ l.principal *= fator; });
+    return custo;
+  }
+
+  for(let m=0;m<meses;m++){
+    const anoAtual = Math.floor(m/12)+1;
+    const mesNoAno = (m%12)+1;
+
+    // Início do ano: reajuste por IPCA do ano anterior + cortes
+    if(mesNoAno===1){
+      // corte primeiro
+      const corte = cortes.find(c=>c.ano===anoAtual);
+      if(corte && typeof corte.novoAporte==='number') aporteBaseAno = corte.novoAporte;
+      else if(anoAtual>1) aporteBaseAno = aporteBaseAno * (1 + ipcaPorAno[anoAtual-2]);
+      // iniciar agregadores do ano
+      if(!rowsAno[anoAtual-1]) rowsAno[anoAtual-1] = {ano:anoAtual, saldoInicio: saldoCaixa + lotes.reduce((s,l)=>s+l.principal,0), aporteAno:0, jurosAno:0, irAno:0, admAno:0, saldoFim:null, aporteBaseAno, ipcaAno: ipcaPorAno[anoAtual-1], corte: corte? (corte.nota?('Sim — '+corte.nota):'Sim') : ''};
+    }
+
+    // Depósito do mês (no início)
+    const aporteMes = aporteBaseAno;
+    investidoAportes += aporteMes;
+    rowsAno[anoAtual-1].aporteAno += aporteMes;
+
+    // dividir aporte entre instrumentos e caixa
+    const paraCaixa = aporteMes * caixaFrac;
+    saldoCaixa += paraCaixa;
+    alocFrac.forEach(i=>{
+      const v = aporteMes * i.frac;
+      if(v<=0) return;
+      const prazoMeses = Math.max(1, Math.round(i.vcto*12));
+      lotes.push({
+        tipo:i.tipo,
+        principal:v,
+        principalIni:v,
+        mesesRest:prazoMeses,
+        taxaAnual:(i.taxa||0)/100,
+        prazoMeses:prazoMeses,
+        reinv: !!i.reinv
+      });
+    });
+
+    // Render nos lotes
+    lotes.forEach(l=>{
+      const rMensal = Math.pow(1+l.taxaAnual,1/12)-1;
+      const j = l.principal * rMensal;
+      l.principal += j;
+      jurosAno += j;
+      l.mesesRest -= 1;
+    });
+
+    // Maturidade: aplicar IR (se CDB), reinvestir ou mandar p/ caixa
+    for(let i=lotes.length-1;i>=0;i--){
+      const l = lotes[i];
+      if(l.mesesRest<=0){
+        const ganho = Math.max(0, l.principal - l.principalIni);
+        let ir=0;
+        if(l.tipo==='CDB'){
+          const aliq = irCdbAliquota(l.prazoMeses);
+          ir = ganho * aliq;
         }
-        if (typeof c.taxa === 'number' && !Number.isNaN(c.taxa)) {
-          taxaAnualVigente = c.taxa / 100;
+        irAno += ir;
+        const liquido = l.principal - ir;
+        if(l.reinv){
+          // reinicia lote
+          l.principal = liquido;
+          l.principalIni = liquido;
+          l.mesesRest = l.prazoMeses;
+        }else{
+          saldoCaixa += liquido;
+          lotes.splice(i,1);
         }
-      } else if (anoAtual > 1) {
-        // sem corte: aporte base cresce pelo IPCA médio no início do ano (a partir do ano 2)
-        aporteBaseAno = aporteBaseAno * (1 + ipcaMedio);
       }
     }
 
-    // rótulo do mês
-    const d = new Date(startDate.getFullYear(), startDate.getMonth() + m, 1);
-    const label = d.toLocaleDateString('pt-BR', { year:'numeric', month:'2-digit' });
-    labels.push(label);
+    // Caixa rende 0% nominal (pode-se estender para taxa da caixa se desejar)
 
-    const saldoInicio = saldo;
+    // Taxa de administração mensal (sobre total)
+    const custoAdm = aplicarTaxaAdm();
+    admAno += custoAdm;
 
-    // aporte no início do mês
-    const aporteMes = aporteBaseAno;
-    saldo += aporteMes;
-    investidoAportes += aporteMes;
+    // Fim do ano -> registrar séries
+    if(mesNoAno===12){
+      const total = saldoCaixa + lotes.reduce((s,l)=>s+l.principal,0);
+      rowsAno[anoAtual-1].jurosAno += jurosAno - irAno - admAno;
+      rowsAno[anoAtual-1].irAno += irAno;
+      rowsAno[anoAtual-1].admAno += admAno;
+      rowsAno[anoAtual-1].saldoFim = total;
 
-    // juros do mês sobre o saldo após o aporte
-    const taxaMensal = Math.pow(1 + taxaAnualVigente, 1/12) - 1;
-    const jurosMes = saldo * taxaMensal;
-    saldo += jurosMes;
+      // séries p/ gráfico
+      xLabels.push(`Ano ${anoAtual}`);
+      const investidoAteAqui = toNum(E.valorInicial) + investidoAportes;
+      serieInvestido.push(investidoAteAqui);
+      serieSaldoNominal.push(total);
 
-    // séries para gráfico
-    const totalInvestidoAteAqui = toNumber(el.valorInicial) + investidoAportes;
-    investidoSerie.push(totalInvestidoAteAqui);
-    saldoSerie.push(saldo);
-    jurosAcumSerie.push(Math.max(0, saldo - totalInvestidoAteAqui));
+      // poder de compra: deflator acumulado até este ano
+      const infl = ipcaPorAno.slice(0, anoAtual).reduce((acc,x)=>acc*(1+x),1);
+      const saldoReal = total / infl;
+      serieSaldoReal.push(saldoReal);
 
-    // linha para tabela
-    rows.push({
-      label, saldoInicio, aporteMes, jurosMes, saldoFim: saldo,
-      aporteBaseAno, taxaAnualVigente, corteAqui: cortesMap.has(anoAtual) && mesNoAno===1 ? 'Sim' : ''
-    });
+      const idxPoderCompra = (toNum(E.valorInicial)) / infl; // índice baseado no saldo inicial
+      seriePoderCompraIdx.push(idxPoderCompra);
+
+      // reset contadores anuais
+      saldo = total;
+      jurosAno=0; irAno=0; admAno=0;
+    }
   }
 
   // KPIs
-  const totalInvestido = toNumber(el.valorInicial) + investidoAportes;
-  const jurosAcum = Math.max(0, saldo - totalInvestido);
-
-  el.kpiInvestido.textContent = fmtBRL(totalInvestido);
-  el.kpiJuros.textContent = fmtBRL(jurosAcum);
-  el.kpiSaldo.textContent = fmtBRL(saldo);
+  const investidoTotal = toNum(E.valorInicial) + investidoAportes;
+  const saldoFinal = serieSaldoNominal.at(-1) || 0;
+  const jurosLiquidos = Math.max(0, saldoFinal - investidoTotal);
+  E.kpiInvestido.textContent = brl(investidoTotal);
+  E.kpiSaldo.textContent = brl(saldoFinal);
+  E.kpiJuros.textContent = brl(jurosLiquidos);
 
   // Tabela
-  desenharTabela(rows, totalInvestido, jurosAcum, saldo);
+  renderTabela(rowsAno, serieSaldoReal);
 
   // Gráfico
-  desenharGrafico(labels, investidoSerie, saldoSerie, jurosAcumSerie);
+  renderGrafico(xLabels, serieInvestido, serieSaldoNominal, serieSaldoReal, seriePoderCompraIdx, rowsAno);
 }
 
-function desenharTabela(rows, totalInvestido, jurosAcum, saldoFinal){
-  el.tblBody.innerHTML = '';
-  const frag = document.createDocumentFragment();
-
-  let somaAportes = 0, somaJuros = 0;
-
-  rows.forEach(r => {
-    const tr = document.createElement('tr');
+/* ======= Tabela anual ======= */
+function renderTabela(rows, serieSaldoReal){
+  E.tblBody.innerHTML='';
+  const frag=document.createDocumentFragment();
+  rows.forEach((r,idx)=>{
+    const tr=document.createElement('tr');
     tr.innerHTML = `
-      <td class="left">${r.label}</td>
-      <td>${fmtBRL(r.saldoInicio)}</td>
-      <td>${fmtBRL(r.aporteMes)}</td>
-      <td>${fmtBRL(r.jurosMes)}</td>
-      <td>${fmtBRL(r.saldoFim)}</td>
-      <td>${fmtBRL(r.aporteBaseAno)}</td>
-      <td>${(r.taxaAnualVigente*100).toFixed(2)}%</td>
-      <td>${r.corteAqui}</td>
+      <td class="left">${r.ano}</td>
+      <td>${brl(r.saldoInicio)}</td>
+      <td>${brl(r.aporteAno)}</td>
+      <td>${brl(r.jurosAno)}</td>
+      <td>${brl(r.irAno)}</td>
+      <td>${brl(r.admAno)}</td>
+      <td>${brl(r.saldoFim)}</td>
+      <td>${brl(serieSaldoReal[idx]||0)}</td>
+      <td>${brl(r.aporteBaseAno)}</td>
+      <td>${((r.ipcaAno||0)*100).toFixed(2)}%</td>
+      <td>${r.corte||''}</td>
     `;
     frag.appendChild(tr);
-    somaAportes += r.aporteMes;
-    somaJuros += r.jurosMes;
   });
-  el.tblBody.appendChild(frag);
-  el.ftAportes.textContent = fmtBRL(somaAportes);
-  el.ftJuros.textContent = fmtBRL(somaJuros);
-  el.ftSaldo.textContent = fmtBRL(saldoFinal);
+  E.tblBody.appendChild(frag);
 }
 
-function desenharGrafico(labels, investido, saldo, jurosAcum){
-  // gradient helpers
-  const ctx = el.chartCanvas.getContext('2d');
-  const gradSaldo = ctx.createLinearGradient(0,0,0,200);
-  gradSaldo.addColorStop(0, 'rgba(255,209,102,.45)');
-  gradSaldo.addColorStop(1, 'rgba(255,209,102,0)');
-  const gradJuros = ctx.createLinearGradient(0,0,0,200);
-  gradJuros.addColorStop(0, 'rgba(6,214,160,.5)');
-  gradJuros.addColorStop(1, 'rgba(6,214,160,0)');
+/* ======= Gráfico ======= */
+function renderGrafico(labels, investido, saldoNom, saldoReal, poderCompraIdx, rows){
+  if(chart) chart.destroy();
+  const annotations = {};
 
-  if (chart) chart.destroy();
-  chart = new Chart(el.chartCanvas, {
-    type: 'line',
-    data: {
+  // Cortes: linhas verticais
+  rows.forEach((r,idx)=>{
+    if(r.corte){
+      annotations['corte_'+idx] = {
+        type:'line', xMin: idx, xMax: idx,
+        borderColor: '#ffd166', borderWidth: 2, borderDash:[6,6],
+        label:{enabled:true, content:`Corte ${r.ano}`, position:'start', backgroundColor:'#0e1630', color:'#ffd166'}
+      };
+    }
+  });
+
+  // Metas: linhas horizontais
+  metas.forEach((m,i)=>{
+    annotations['meta_'+i] = {
+      type:'line', yMin: m.valor, yMax: m.valor,
+      borderColor: '#26b6bd', borderWidth: 2,
+      label:{enabled:true, content:`Meta ${m.ano}: ${brl(m.valor)}`, position:'end', backgroundColor:'#0e1630', color:'#26b6bd'}
+    };
+  });
+
+  // Registrar plugin
+  Chart.register(window['chartjs-plugin-annotation']);
+
+  chart = new Chart(E.chartEl, {
+    type:'line',
+    data:{
       labels,
-      datasets: [
+      datasets:[
         {
-          label: 'Investido',
-          data: investido,
-          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--acc').trim(),
-          backgroundColor: 'transparent',
-          tension:.2,
-          borderWidth:2
+          label:'Investido',
+          data:investido,
+          borderColor:'var(--blue)',
+          backgroundColor:'transparent',
+          tension:.25, borderWidth:2, fill:false
         },
         {
-          label: 'Saldo (com juros)',
-          data: saldo,
-          borderColor: '#f1c40f',
-          backgroundColor: gradSaldo,
-          fill:true,
-          tension:.25,
-          borderWidth:2
+          label:'Saldo (nominal)',
+          data:saldoNom,
+          borderColor:'var(--orange)',
+          backgroundColor:'transparent',
+          tension:.22, borderWidth:2, fill:false
         },
         {
-          label: 'Juros acumulados',
-          data: jurosAcum,
-          borderColor: '#06d6a0',
-          backgroundColor: gradJuros,
-          fill:true,
-          tension:.25,
-          borderWidth:1.5
+          label:'Saldo (R$ de hoje)',
+          data:saldoReal,
+          borderColor:'var(--green)',
+          backgroundColor:'transparent',
+          tension:.22, borderWidth:2, fill:false
+        },
+        {
+          label:'Poder de compra (índice)',
+          data:poderCompraIdx,
+          borderColor:'var(--violet)',
+          backgroundColor:'transparent',
+          tension:.22, borderWidth:2, fill:false, borderDash:[4,4]
         }
       ]
     },
-    options: {
-      responsive:true,
-      maintainAspectRatio:false,
+    options:{
+      responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{labels:{color:'#dbe7ff'}},
-        tooltip:{
-          callbacks:{
-            label:(ctx)=> `${ctx.dataset.label}: ${fmtBRL(ctx.parsed.y)}`
-          }
-        }
-      },
       scales:{
-        x:{ticks:{color:'#cfe4ff'}, grid:{color:'rgba(255,255,255,.05)'}},
-        y:{ticks:{color:'#cfe4ff', callback:(v)=>fmtBRL(v)}, grid:{color:'rgba(255,255,255,.05)'}}
+        y:{beginAtZero:true, ticks:{color:'#cfe4ff', callback:v=>brl(v)}, grid:{color:'rgba(255,255,255,.06)'}},
+        x:{ticks:{color:'#cfe4ff'}, grid:{color:'rgba(255,255,255,.05)'}}
+      },
+      plugins:{
+        legend:{labels:{color:'#dbe7ff', boxWidth:12}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${brl(ctx.parsed.y)}`}},
+        annotation:{annotations}
       }
     }
   });
 }
 
-/** ==========================
- *  CSV
- *  ========================== */
+/* ======= CSV & PNG ======= */
 function baixarCSV(){
-  const rows = [['Mes','SaldoInicio','AporteMes','JurosMes','SaldoFim','AporteBaseAno','TaxaAnualVigente','Corte']];
-  document.querySelectorAll('#tbl tbody tr').forEach(tr=>{
-    const cols = Array.from(tr.querySelectorAll('td')).map(td=>td.innerText.replace(/\./g,'').replace('R$ ','').replace(',','.'));
+  const rows=[['Ano','SaldoInicio','AporteAno','JurosAnoLiquido','IR','TaxaAdm','SaldoFinal','SaldoReal','AporteBaseAno','IPCAAno','Corte']];
+  E.tblBody.querySelectorAll('tr').forEach(tr=>{
+    const cols=Array.from(tr.children).map(td=>td.innerText.replace(/\./g,'').replace('R$ ','').replace(',','.'));
     rows.push(cols);
   });
-  const csv = rows.map(r=>r.join(';')).join('\n');
-  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'simulacao_juros_ipca.csv';
-  a.click();
-  URL.revokeObjectURL(a.href);
+  const csv=rows.map(r=>r.join(';')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='simulacao_anual.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+function baixarPNG(){
+  const a=document.createElement('a');
+  a.href=E.chartEl.toDataURL('image/png',1.0);
+  a.download='grafico.png'; a.click();
 }
 
-/** ==========================
- *  Eventos
- *  ========================== */
-el.btnBuscarIPCA.addEventListener('click', async ()=>{
+/* ======= Eventos ======= */
+E.btnBuscarIPCA.addEventListener('click', async ()=>{
   try{
-    el.btnBuscarIPCA.disabled = true; el.btnBuscarIPCA.textContent = 'Buscando...';
-    const { ipcaAnualGeometrico, inicio, fim } = await buscarIPCAGeometrico20Anos();
-    const pct = (ipcaAnualGeometrico*100);
-    el.ipcaMedioInput.value = pct.toFixed(2);
-    el.ipcaFonte.innerHTML = `IPCA médio geométrico (20 anos): <b>${pct.toFixed(2)}% a.a.</b> • Período: ${inicio} a ${fim}. Fonte: Bacen/SGS 433.`;
-  }catch(e){
-    console.error(e);
-    alert('Não consegui buscar o IPCA agora. Você pode informar manualmente.');
-  }finally{
-    el.btnBuscarIPCA.disabled = false; el.btnBuscarIPCA.textContent = '🔎 Buscar IPCA (20 anos)';
-  }
+    E.btnBuscarIPCA.disabled=true; E.btnBuscarIPCA.textContent='Buscando...';
+    const {annual,inicio,fim}=await buscarIPCAGeometrico20Anos();
+    E.ipcaMedioInput.value=(annual*100).toFixed(2);
+    E.ipcaFonte.innerHTML=`IPCA médio (geom., 20 anos): <b>${(annual*100).toFixed(2)}% a.a.</b> • Período ${inicio}–${fim}`;
+  }catch(e){ alert('Não consegui buscar o IPCA agora. Insira manualmente.'); }
+  finally{ E.btnBuscarIPCA.disabled=false; E.btnBuscarIPCA.textContent='🔎 Buscar IPCA'; }
+});
+E.btnUsar5.addEventListener('click',()=>{ E.ipcaMedioInput.value='5.00'; E.ipcaFonte.textContent='IPCA médio definido manualmente: 5,00% a.a.'; });
+
+E.projModelo.addEventListener('change', ()=>{
+  const v=E.projModelo.value;
+  E.boxReversao.style.display = v==='reversao' ? 'flex' : 'none';
+  E.boxCustom.style.display   = v==='custom'   ? 'block' : 'none';
 });
 
-el.btnUsarPadrao.addEventListener('click', ()=>{
-  el.ipcaMedioInput.value = '5.00';
-  el.ipcaFonte.textContent = 'IPCA médio definido manualmente como 5,00% a.a.';
-});
-
-el.btnAddCorte.addEventListener('click', ()=>{
-  const ano = Math.max(1, Math.floor(toNumber(el.corteAno)));
-  if (!ano) { alert('Informe o ano do corte (>=1)'); return; }
-  const taxa = el.corteTaxa.value === '' ? undefined : parseFloat(el.corteTaxa.value.replace(',', '.'));
-  const aporte = el.corteAporte.value === '' ? undefined : parseFloat(el.corteAporte.value.replace(',', '.'));
-  if (taxa===undefined && aporte===undefined){ alert('Informe a nova taxa, o novo aporte ou ambos.'); return; }
-  // se já existe, substitui
+E.btnAddCorte.addEventListener('click',()=>{
+  const ano = Math.max(1, Math.floor(toNum(E.corteAno)));
+  if(!ano){ alert('Informe o ano do corte (>=1)'); return; }
+  const novoAporte = E.corteAporte.value==='' ? undefined : parseFloat(E.corteAporte.value.replace(',','.'));
+  const nota = E.corteNota.value?.trim() || '';
   const i = cortes.findIndex(c=>c.ano===ano);
-  const novo = { ano, ...(taxa!==undefined?{taxa}:{}) , ...(aporte!==undefined?{aporte}:{}) };
-  if (i>=0) cortes[i]=novo; else cortes.push(novo);
+  const novo = {ano, ...(novoAporte!==undefined?{novoAporte}:{}) , ...(nota?{nota}:{})};
+  if(i>=0) cortes[i]=novo; else cortes.push(novo);
+  E.corteAno.value=''; E.corteAporte.value=''; E.corteNota.value='';
   renderCortes();
-  el.corteAno.value=''; el.corteTaxa.value=''; el.corteAporte.value='';
 });
+E.btnLimparCortes.addEventListener('click',()=>{ cortes=[]; renderCortes(); });
 
-el.btnLimparCortes.addEventListener('click', ()=>{ cortes = []; renderCortes(); });
+E.btnAddMeta.addEventListener('click',()=>{
+  const ano = Math.max(1, Math.floor(toNum(E.metaAno)));
+  const valor = parseFloat(E.metaValor.value?.replace(',','.'));
+  if(!ano || Number.isNaN(valor)){ alert('Informe ano e valor da meta.'); return; }
+  metas.push({ano, valor});
+  metas.sort((a,b)=>a.valor-b.valor);
+  E.metaAno.value=''; E.metaValor.value=''; renderMetas();
+});
+E.btnLimparMetas.addEventListener('click',()=>{ metas=[]; renderMetas(); });
 
-el.btnCalcular.addEventListener('click', ()=> simular());
-el.btnCSV.addEventListener('click', ()=> baixarCSV());
+E.btnAddInst.addEventListener('click',()=> addInstRow({tipo:'CDB', taxa:12, vcto:2, aloc:50, reinv:true}));
+E.btnExemplo.addEventListener('click',()=>{
+  E.instTable.innerHTML='';
+  addInstRow({tipo:'CDB', taxa:12, vcto:2, aloc:100, reinv:true});
+});
+E.btnCalcular.addEventListener('click',()=> simular());
+E.btnCSV.addEventListener('click',()=> baixarCSV());
+E.btnPNG.addEventListener('click',()=> baixarPNG());
 
-// inicial
-renderCortes();
+/* ======= Inicial ======= */
+addInstRow({tipo:'CDB', taxa:12, vcto:2, aloc:100, reinv:true});
+renderCortes(); renderMetas();
+simular();
 </script>
 </body>
 </html>
