@@ -1,0 +1,238 @@
+﻿You are a senior full-stack developer and cloud architect. Your role is to act as the lead (and sole) developer for a new web application, "Project Netrunner."
+Your primary objective is to build the complete, functional, and interactive web application based on the comprehensive design document provided below. We will build this application iteratively. I will act as the project manager, providing you with a series of development tasks in a logical order, starting from the foundation and working our way up to the complex features.
+This prompt contains the entire project brief. You must internalize it and refer back to it for every subsequent request to ensure absolute consistency in theme, functionality, and design.
+After you have processed the entire brief, your first task will be to propose the optimal technology stack for the project.
+________________
+PROJECT BRIEF: PROJECT NETRUNNER 
+
+
+Phase 1: The Core Vision & The "Why"
+
+
+This section is about the big picture. Why should this exist, and what feeling should it evoke?
+1. The Elevator Pitch
+A web application that transforms your life into a game. The core promise is to gamify personal development through a system of tangible progress and rewards.
+Key features include:
+* RPG Progression: Users earn Experience Points (XP) and a virtual currency to level up a character, unlocking upgrades and abilities over time.
+* Dynamic Task Management: Users can create their own tasks and objectives, define their difficulty, and work towards achievements.
+* Long-Term Goal Setting: The app includes frameworks for setting and tracking ambitious, multi-year "scary goals," breaking them down into achievable yearly milestones.
+* Unique "Time as Currency" Mechanic: Every day, the user is allocated a budget of time (e.g., 16 hours). Productive actions can earn back time or even generate a surplus, while unproductive actions will cost time, creating a deficit. The goal is to manage this resource effectively.
+* Integrated Tools: The system includes built-in productivity tools like Pomodoro timers, all integrated within the game's framework.
+2. Core Motivation
+The primary goal is to solve common productivity challenges such as:
+* Procrastination
+* Lack of motivation
+* Feeling overwhelmed or lacking clear goals
+It aims to provide a more engaging and fun perspective on work and personal development. For example, a study session becomes a "mission" that grants XP and currency. A key feature is a post-task reflection prompt, asking "How was this productive? What did I learn? What progress did I make?" to reinforce the value of the effort.
+3. Target Feeling
+When a user logs in, the desired feelings are excitement and organization. There is also a goal to evoke a sense of competitiveness, potentially through a future ranking or leaderboard system.
+
+
+
+
+
+
+
+
+
+
+4. Target Audience
+While the project is initially being built to solve personal challenges, its intended audience is broad. It is designed for any individual who wants to gamify their life as a more engaging way to learn and make progress.
+This includes, but is not limited to:
+* Students
+* Professionals
+* Individuals with ADHD
+The core target audience is anyone who wants to progress but currently feels stuck, unmotivated, or prone to self-sabotage.
+
+
+
+
+
+
+
+
+1a. Project Philosophy & The "Win" Condition
+The "game" of Project Netrunner is a metaphor for the user's real-world personal growth. The ultimate objective is not to beat a final boss within the app, but to use the app as a tool to achieve one's own ambitious goals.
+The user's journey is framed as an up-and-coming hacker on a path to becoming a legend. Real-life tasks are the Contracts they take on to build their reputation and skills. "Winning the game" means successfully completing the Epic Hacks—the user's self-defined, long-term goals. The Netrunner's high level and upgraded Cyberdeck serve as the proof and story of that real-world journey.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Phase 2 Game Design Document: Project Netrunner
+1. Central Metaphor: The Netrunner
+This project uses the "Netrunner" cyberpunk theme. The core fantasy is that the user is a master hacker infiltrating corporate systems. All game terminology will reflect this theme.
+* The User is a: Netrunner or Operator.
+* The Main Dashboard is the: Command Line or The Rig.
+* Tasks are: Contracts, Jobs, or Hacks.
+* Habits/Dailies are: Maintenance Subroutines.
+* Long-Term Goals are: Epic Hacks.
+* Experience Points are: EXP.
+* Leveling Up is: Upgrading your Cyberdeck.
+* Time Currency is: Bandwidth (BW).
+* Reward Currency is: ¥ (New Yen) or Crypto-Credits (CC).
+* Upgrades are: Software, ICE Breakers, and Deck Mods.
+* Skills are organized in: Skill Trees.
+2. The Core Economy: Bandwidth & Credits
+This system governs the user's daily resources.
+* Daily Bandwidth Budget: The user starts each day with a fixed amount of Bandwidth (e.g., 16 hours, based on 24 hours minus sleep → the user need to choose the amount of hours of sleep per day).
+* Executing Contracts (Productivity): Completing a planned, productive task is like running a program. It consumes Bandwidth for its duration but rewards the user with EXP, ¥, and may even return a small Bandwidth bonus for efficiency (e.g., a 1-hour task costs 1 BW but returns 0.25 BW).
+* Signal Noise (Distractions): The user can log unplanned, unproductive time (e.g., mindless scrolling). This action subtracts from their daily Bandwidth pool without giving any rewards. But it have a higher weight, as for example instead of 1 hour costs 1 BW for these actions, it will cost 1 BW (we can add a difficulty levels that each one has a different costs and rewards)
+* End of Day: The goal is to finish the day with a positive Bandwidth balance.
+Your Decision:
+Leftover Bandwidth is converted into bonus ¥ at a 1 BW = 100 ¥ ratio.
+________________
+Purpose of ¥ (Crypto-Credits): Tools & Customization ¥ is the tangible reward for work, serving as the in-game currency. It is spent at the Black Market (the store) to acquire tactical advantages and personalize the user experience.
+* Functional Software: Items that provide passive gameplay bonuses (e.g., boosts to earnings, reduction in penalties).
+* Cosmetic Mods: Items that change the application's visual theme, avatars, or sound effects, allowing for self-expression.
+
+
+3. The Contract System
+This is how real-life tasks are structured in the game.
+* Maintenance Subroutines (Dailies): Recurring habits. Give small, consistent rewards.
+* Main Contracts (To-Dos): Standard, one-off tasks.
+* Epic Hacks (Long-Term Goals): Large projects broken down into Milestones.
+Your Decision:
+How is the difficulty (and reward calculation) for a Contract determined? [Mix of the following both, as the user set the difficult of the contract, and set the amounts of pomodoros for it, or the amount of time if the user doesnt uses pomodoros. If the user passes the time set for an easy task for example, it will lose some of the original reward. As some times, it is not time that sets works, but the focus and work done you can do. Like the Flow state of mind. "Manual User Setting: The user marks each contract as Low-Profile (Easy), Standard-Op (Medium), or High-Stakes (Hard)." or "Time-Based: The difficulty and rewards are automatically calculated based on the number of Pomodoro sessions the user assigns to the contract."]
+________________
+
+
+4. Progression System: EXP, Deck Upgrades & Skill Trees
+This system governs the user's long-term growth and customization.
+* EXP & Deck Upgrades: All completed Contracts award EXP. Accumulating enough EXP results in a Deck Upgrade (Level Up), which awards Skill Points.
+* Software & Mods: ¥ is spent in a "store" to buy items. These could be cosmetic (new themes for the UI) or functional (Software that provides a passive bonus, like "+5% EXP from all 'Study' contracts").
+* Skill Trees: Skill Points are invested in trees to unlock powerful passive abilities, customizing the user's playstyle.
+Your Decision:
+Define the 3-4 primary Skill Trees. For each tree, give it a thematic name and describe its general purpose. [I want all for ahead]
+* System Infiltration (Work/Study): Skills that boost rewards and efficiency for intellectual or career-related tasks.
+* Hardware Maintenance (Health/Fitness): Skills focused on physical well-being, habits, and consistency.
+* Social Engineering (People/Communication): Skills that enhance social goals, networking, and communication tasks.
+* Black ICE Ops (Discipline/Mental): Skills related to focus, resisting distraction, and mental fortitude.
+Purpose of EXP (Experience Points): Growth & Mastery EXP is the direct measure of the user's progress and consistency over time. Its sole purpose is to fuel the progression system. Earning EXP leads to Deck Upgrades (Leveling Up), which in turn awards Skill Points. These points are then invested in the Skill Trees to unlock permanent, passive abilities that make future efforts more effective and rewarding, creating a positive feedback loop of growth.
+________________
+
+
+5. The Reflection Loop: The Hack Debrief
+This system reinforces the learning and progress from completed tasks, based on your original idea.
+* The Mechanic: After completing a significant Contract, a prompt appears for the user to briefly answer: "How was this productive?", "What did I learn?", "What progress did I make?".
+* The Reward: Completing the Hack Debrief awards a small bonus of EXP or ¥, rewarding the act of reflection.
+Your Decision:
+When should the Hack Debrief prompt appear? ["It is optional for all Main Contracts and Epic Hack milestones, but it will always appear until the user deactivates it the for task. The user can click in dont answer and just leave."]
+________________
+
+
+6. Failure & Consequences: Signal Debt
+This system defines what happens when a user runs out of their daily time currency.
+* The State: If a user spends more Bandwidth than their daily budget allows (either through Signal Noise or over-scheduling), they enter a state of Signal Debt.
+Your Decision:
+What is the gameplay penalty for being in Signal Debt? ["While in Signal Debt, the user suffers a -25% penalty on all EXP and ¥ gains." and "The UI visuals become gritty and 'glitched' as a visual reminder."]
+
+
+
+
+Phase 3: User Experience & Interface (The Complete & Definitive Version)
+The design philosophy is to create a deep, immersive, and highly functional digital world. The interface is not merely a tool but a living system—reactive, detailed, and deeply thematic. Every click, transition, and notification is crafted to enhance the core fantasy of being an elite Netrunner.
+________________
+
+
+Core Navigation: The "Neuralink" Hub
+The primary navigation is not a static bar but an experience. A persistent, minimalist hub icon, when clicked, blooms into a full-screen "Neuralink" holographic overlay. This displays a stunning, animated map of the user's core systems as interconnected nodes. Each node (e.g., "Mission Control," "The Cyberdeck") pulses with a soft light. Selecting a node triggers a fluid, high-tech screen transition with a subtle "data whoosh" sound effect, making movement through the app feel intentional and powerful.
+________________
+
+
+1. The Command Line (Dashboard)
+This is your central hub, the first screen you jack into. It's designed for at-a-glance comprehension and immediate action.
+* Core Fantasy: The command center of your rig, displaying real-time diagnostics and urgent mission data.
+* Layout & Features: A three-column layout on a dynamic background with subtle, animated grid lines and flowing data streams.
+   * Left Column (Vitals): Your identity and system health.
+      * Netrunner ID: Your Alias in a stylized font, with "Deck Ver. [Level]" below.
+      * System Status: A detailed diagnostic panel. The Bandwidth (BW) is shown as a dynamic, circular gauge that visually drains, flashing amber when low and a pulsing, glitchy magenta when in Signal Debt. EXP is a thin, glowing bar, and ¥ is a crisp numerical readout.
+   * Center Column (Action): What needs to be done right now.
+      * Mission Briefing: A dynamic header with contextual messages: "3 High-Stakes Contracts in queue. Review in Mission Control."
+      * Active Contracts: A streamlined list of today's tasks only, with color-coded difficulty indicators and drag-and-drop priority reordering.
+   * Right Column (Intel): A live feed of your activity.
+      * Data Stream: A scrolling console log of all recent actions and rewards, timestamped for authenticity.
+      * System Alerts: A module that only appears when needed, displaying critical warnings like Signal Debt status in a glitchy, magenta box.
+* Unique Feature: The "Glitch" System. The UI features rare, deliberate visual glitches. These are not bugs but narrative events. A specific glitch might momentarily reveal a hidden "ghost contract" on your list or a string of code that acts as a temporary discount coupon at the Black Market, rewarding hyper-observant users.
+________________
+
+
+2. The Core User Flow: Executing a "Contract"
+This is the most critical interaction loop, engineered for maximum satisfaction.
+1. Creation (The Plan): Contracts are created via a smart input bar for quick adds. For details, a [+] button opens a sleek, semi-transparent modal overlay. This detailed editor allows for tagging, time estimates, difficulty setting, and linking to an Epic Hack.
+2. Activation (The Hack): Clicking the glowing "▶ Initiate Hack" button triggers a screen-wide glitch animation and transitions the UI into Focus Protocol Mode. The screen minimizes all distractions, showing only a large, glowing Pomodoro timer and the Contract name, all while a subtle, rhythmic "focus drone" hums in the background.
+3. Completion (The Payday): This is the moment of reward. A sharp, high-fidelity "DATA TRANSFER COMPLETE" sound effect plays. The completed Contract's text is consumed by a burst of neon data particles, which then visually flow into and increment your EXP and ¥ readouts. The Hack Debrief prompt then slides in smoothly for optional reflection and bonus rewards.
+________________
+
+
+3. Mission Control (The Contracts Page)
+The strategic heart of the application, where you manage all operations beyond today's immediate tasks.
+* Core Fantasy: A professional operative's planning and strategy interface.
+* Key Features (Multi-View Interface):
+   * The Queue: A powerful, multi-column view of all Contracts, filterable and sortable like a professional project management tool.
+   * The Calendar: An interactive calendar for visual planning, with drag-and-drop scheduling and the ability to sync with external calendars (read-only) to display real-world appointments as "firewalls" to work around.
+   * The Bounty Board: A procedurally generated job board with unique, high-risk, high-reward challenges issued by the system to add variety.
+* Unique Feature: The Epic Hack Timeline. When viewing a long-term goal, the interface presents a visually stunning Gantt chart-style timeline. It shows the entire project laid out over its duration, with milestones and dependencies clearly marked. Your progress is visualized as a vibrant data stream flowing along the timeline, providing a powerful and motivating overview of your journey towards your biggest goals.
+________________
+
+
+4. The Cyberdeck (Skills, Stats & Progression)
+Your personal workshop, diagnostics lab, and character sheet.
+* Core Fantasy: Meticulously upgrading your rig, analyzing your performance, and equipping the right tools for the job.
+* Key Features:
+   * Skill Trees: A deeply interactive and animated neural network. Each of the four skill trees has a unique color. Spending a point triggers a visually satisfying animation of energy flowing from your "Core" to the new node, which flashes and activates with a distinct "Subroutine Activated" sound effect.
+   * Core Stats: A detailed diagnostics screen with slick, animated graphs charting your long-term performance, productivity habits, and efficiency trends.
+   * Achievements: A "Trophy Wall" showcasing unique, animated icons for major accomplishments.
+* Unique Feature: The Loadouts System. You can create and save multiple Loadouts—preset combinations of equipped Software (functional items) and cosmetic Mods. With a single click, you can switch from your "Deep Work Loadout" (min
+(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
