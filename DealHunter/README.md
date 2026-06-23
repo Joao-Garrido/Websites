@@ -1,10 +1,56 @@
-# DealHunter Imobiliário — Motor Financeiro (Fase 1)
+# DealHunter Imobiliário
 
-Motor de descoberta e triagem de imóveis para compra alavancada onde **o aluguel
-paga a maior parte da parcela**. Esta entrega cobre a **Fase 1** da especificação:
-o engine financeiro em Python puro, validado por `pytest` contra os exemplos do
-§13. **Sem UI ainda** — é a fonte de verdade da matemática sobre a qual as fases
-seguintes (API, descoberta, frontend, monitoramento) serão construídas.
+Motor de **descoberta e triagem de imóveis** para compra alavancada onde **o
+aluguel paga a maior parte da parcela** — você dá a entrada, financia o resto,
+aluga, e o inquilino paga a parcela. O app caça imóveis em escala, pontua cada um
+por um **Opportunity Score** com **farol** 🟢🟡🔴, detecta pechinchas e monitora
+quedas de preço.
+
+Stack completo, todas as 6 fases da especificação implementadas:
+
+- **Engine financeiro** — Python puro, fonte de verdade da matemática (`engine/`).
+- **API + persistência** — FastAPI + SQLAlchemy/SQLite, pronto p/ Postgres (`api/`).
+- **Descoberta** — extractors por portal + Firecrawl + dedupe + comparáveis (`discovery/`).
+- **Frontend** — Next.js 14 + Tailwind + Recharts + Leaflet (`frontend/`).
+
+```
+engine/      Fase 1  SAC/Price, aluguel líq., desembolso, métricas, break-evens, score
+api/         Fase 2  CRUD, feed, detalhe/cenário, histórico       + Fase 5 (alertas/mapa)
+discovery/   Fase 3  sweeps, extractors isolados, comparáveis, estimativa de aluguel
+api/services Fase 6  heatmap de sensibilidade + Monte Carlo
+frontend/    Fase 4  feed, detalhe c/ sliders, busca NL, mapa, comparador, premissas
+```
+
+## Rodar tudo
+
+```bash
+# Backend
+pip install -r requirements.txt
+uvicorn api.main:app --reload          # http://localhost:8000  (docs em /docs)
+
+# Frontend (outro terminal)
+cd frontend && npm install && npm run dev   # http://localhost:3000
+
+# Ou os dois de uma vez:
+./run_dev.sh
+```
+
+Sem chaves de API o app funciona offline: a varredura usa dados sintéticos
+(`discovery/sample_data.py`) e a busca em linguagem natural cai para o parser
+heurístico. Com `ANTHROPIC_API_KEY` a busca NL usa Claude; com
+`FIRECRAWL_API_KEY` a varredura/monitoramento usam Firecrawl real.
+
+## Testes
+
+```bash
+python3 -m pytest                       # 58 testes (engine + API), inclui §13
+cd frontend && npm run test:engine      # espelho TS bate com o §13
+cd frontend && npm run build            # type-check + build de produção
+```
+
+---
+
+## Fase 1 — Engine financeiro (fonte de verdade)
 
 ## Conceito núcleo — Desembolso Líquido Mensal (§2)
 
@@ -28,14 +74,7 @@ desembolso_liquido = parcela + condominio + iptu_mensal + manutencao - aluguel_l
 | `engine/scoring.py` | **Farol** 🟢🟡🔴 (§3.1) e **Opportunity Score 0–100 com breakdown** (§3.2) |
 | `engine/evaluate.py` | `avaliar()` — amarra tudo num resultado por imóvel |
 
-## Rodar
-
-```bash
-cd DealHunter
-pip install -r requirements.txt
-pytest                  # 43 testes, inclui validação §13
-python3 demo_section13.py   # imprime os números do §13
-```
+Demonstração isolada do engine: `python3 demo_section13.py`.
 
 ## Validação §13 (reproduzido pelo engine, ±R$1)
 
@@ -61,9 +100,40 @@ python3 demo_section13.py   # imprime os números do §13
 > Disclaimer: estimativas, não recomendação de investimento. O IR é aproximação
 > isolada por imóvel. Valorização passada ≠ futura.
 
-## Próximas fases
+---
 
-Fase 2 (FastAPI + SQLite/persistência) · Fase 3 (descoberta via Firecrawl,
-extractors por portal, comparáveis, estimativa de aluguel) · Fase 4 (frontend
-Next.js: feed, detalhe com sliders, busca em linguagem natural) · Fase 5
-(monitoramento, alertas, mapa, comparador) · Fase 6 (heatmaps, Monte Carlo).
+## Fases 2–6 — App completo
+
+### API (FastAPI) — principais rotas
+- `GET /imoveis` — feed ranqueado por Opportunity Score (com filtros).
+- `POST /imoveis/{id}/detalhe` — cenário completo: cascata, cronograma
+  saldo×patrimônio, break-evens, breakdown do score (aceita overrides p/ sliders).
+- `GET /imoveis/{id}/historico` · `POST /imoveis/{id}/heatmap` · `/montecarlo`.
+- `POST /busca/nl` — busca em linguagem natural (Claude + fallback heurístico).
+- `POST /descoberta/sweep` · `POST /descoberta/importar` (CSV/JSON).
+- `GET|PUT /premissas` (re-pontua a carteira) · `/perfis` · `/alertas` · `/mapa`
+  · `/comparar`.
+
+Documentação interativa em `http://localhost:8000/docs`.
+
+### Descoberta (`discovery/`)
+Extractor **isolado por portal** (ZAP, VivaReal, QuintoAndar, Imovelweb, OLX,
+Chaves na Mão) com falha graciosa — se um quebra, os outros seguem. Dedupe por
+assinatura (bairro+área+preço), comparáveis/subvalorização por microrregião,
+estimativa de aluguel rotulada (`informado|comparaveis|yield`) e pontuação
+automática na ingestão. Firecrawl para scraping/monitoramento real; importador
+CSV/JSON e amostra sintética como fallback offline.
+
+### Frontend (`frontend/`)
+Next.js 14 + Tailwind + Recharts + Leaflet. Sliders usam um **espelho TS do
+engine** (`frontend/lib/engine.ts`) para feedback instantâneo, validado contra o
+§13 (`npm run test:engine`) — mas o valor autoritativo vem sempre da API (Python).
+Ver `frontend/README.md`.
+
+### Configuração (variáveis de ambiente)
+| Var | Efeito |
+|---|---|
+| `DATABASE_URL` | troca SQLite por Postgres (`postgresql+psycopg://…`) |
+| `ANTHROPIC_API_KEY` | busca NL via Claude (senão, parser heurístico) |
+| `FIRECRAWL_API_KEY` | varredura/monitoramento reais (senão, amostra offline) |
+| `NEXT_PUBLIC_API_URL` | URL da API usada pelo frontend |
