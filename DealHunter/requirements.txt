@@ -1,5 +1,11 @@
-# Fase 1 — motor financeiro: sem dependências de runtime (Python puro).
-# A matemática é toda stdlib para manter o engine portátil e auditável.
+# Engine (Fase 1): Python puro, sem dependências de runtime.
+
+# API / persistência (Fases 2–6)
+fastapi>=0.110
+uvicorn[standard]>=0.27
+sqlalchemy>=2.0
+httpx>=0.27           # cliente Claude API e Firecrawl
+python-multipart>=0.0.9
 
 # Dev / testes
 pytest>=7.4
