@@ -1,0 +1,5 @@
+# Fase 1 — motor financeiro: sem dependências de runtime (Python puro).
+# A matemática é toda stdlib para manter o engine portátil e auditável.
+
+# Dev / testes
+pytest>=7.4
