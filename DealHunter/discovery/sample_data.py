@@ -19,7 +19,12 @@ BAIRROS = {
 def gerar(n: int = 24, cidade: str = "São Paulo", seed: int = 42) -> List[Anuncio]:
     rng = random.Random(seed)
     bairros = BAIRROS.get(cidade, [("Centro", "SP")])
-    portais = ["zap", "vivareal", "quintoandar", "imovelweb", "olx", "chavesnamao"]
+    dominios = {
+        "zap": "zapimoveis.com.br", "vivareal": "vivareal.com.br",
+        "quintoandar": "quintoandar.com.br", "imovelweb": "imovelweb.com.br",
+        "olx": "olx.com.br", "chavesnamao": "chavesnamao.com.br",
+    }
+    portais = list(dominios.keys())
     anuncios: List[Anuncio] = []
     for i in range(n):
         bairro, uf = rng.choice(bairros)
@@ -30,10 +35,11 @@ def gerar(n: int = 24, cidade: str = "São Paulo", seed: int = 42) -> List[Anunc
         fator = rng.choice([0.78, 0.85, 0.92, 1.0, 1.0, 1.08, 1.15])
         preco = round(area * base_m2 * fator, -3)
         tipo = "casa" if area >= 100 and rng.random() < 0.4 else "apartamento"
+        portal = rng.choice(portais)
         anuncios.append(Anuncio(
-            fonte=rng.choice(portais),
+            fonte=portal,
             fonte_id=f"S{seed}-{i}",
-            url=f"https://exemplo/{i}",
+            url=f"https://www.{dominios[portal]}/",
             tipo=tipo,
             titulo=f"{tipo.title()} {area}m² {bairro}",
             bairro=bairro, cidade=cidade, uf=uf,

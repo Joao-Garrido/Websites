@@ -148,6 +148,22 @@ def detalhe(db: Session, orm: models.Imovel,
                               modo=cenario.get("modo_amortizacao", "prazo"))
         amort_extra = asdict(r)
 
+    # referência da região (§5.3): mediana de preço PEDIDO (anúncios à venda)
+    chave_regiao = comparables.regiao_key(orm.bairro, orm.cidade, orm.uf)
+    comp_row = comparables.get_comparavel(db, chave_regiao) if chave_regiao else None
+    preco_m2_imovel = eng_im.preco_m2
+    desconto = eng_im.desconto_regiao_pct
+    comparaveis_ref = {
+        "regiao": chave_regiao,
+        "preco_m2_imovel": round(preco_m2_imovel, 2) if preco_m2_imovel else None,
+        "preco_m2_mediana_venda": round(mediana, 2) if mediana else None,
+        "preco_m2_mediana_aluguel": (round(comp_row.preco_m2_mediana_aluguel, 2)
+                                     if comp_row and comp_row.preco_m2_mediana_aluguel else None),
+        "n_amostras": comp_row.n_amostras if comp_row else None,
+        "desconto_regiao_pct": round(desconto, 4) if desconto is not None else None,
+        "origem": "preços pedidos em anúncios à venda na região (não transações registradas)",
+    }
+
     return {
         "imovel_id": orm.id,
         "premissas_aplicadas": {
@@ -194,4 +210,6 @@ def detalhe(db: Session, orm: models.Imovel,
         },
         "cronograma": cronograma,
         "amortizacao_extra": amort_extra,
+        "comparaveis": comparaveis_ref,
+        "url": orm.url,
     }

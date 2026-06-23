@@ -49,8 +49,15 @@ export function ImovelCard({ imovel }: { imovel: Imovel }) {
               <span className="text-green-700 font-medium">{pct(imovel.desconto_regiao_pct, 0)} abaixo</span>
             )}
           </div>
-          <div className="mt-1 text-[11px] text-slate-400">
-            aluguel {brl(imovel.aluguel_estimado)} ({imovel.aluguel_origem})
+          <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+            <span>aluguel {brl(imovel.aluguel_estimado)} ({imovel.aluguel_origem})</span>
+            {imovel.url && (
+              <span role="link" tabIndex={0}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(imovel.url!, "_blank", "noopener"); }}
+                className="font-medium text-blue-600 hover:underline">
+                ver anúncio ↗
+              </span>
+            )}
           </div>
         </div>
       </Card>

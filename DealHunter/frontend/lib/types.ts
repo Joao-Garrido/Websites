@@ -63,6 +63,16 @@ export interface Detalhe {
   metricas: Record<string, number | null>;
   break_evens: { entrada_equilibrio: number | null; aluguel_equilibrio: number | null; prazo_equilibrio: number | null };
   cronograma: { ano: number; saldo_devedor: number; valor_imovel: number; patrimonio: number }[];
+  comparaveis?: {
+    regiao: string | null;
+    preco_m2_imovel: number | null;
+    preco_m2_mediana_venda: number | null;
+    preco_m2_mediana_aluguel: number | null;
+    n_amostras: number | null;
+    desconto_regiao_pct: number | null;
+    origem: string;
+  } | null;
+  url?: string | null;
   amortizacao_extra?: {
     modo: string; extra_mensal: number; prazo_original: number; prazo_novo: number;
     total_juros_original: number; total_juros_novo: number; economia_juros: number;

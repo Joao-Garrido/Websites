@@ -118,6 +118,12 @@ export default function ImovelDetalhe({ params }: { params: { id: string } }) {
             {[imovel.bairro, imovel.cidade].filter(Boolean).join(", ")}{imovel.uf ? `-${imovel.uf}` : ""}
             {" · "}{imovel.quartos}q · {imovel.vagas} vaga(s) · {imovel.area_m2}m² · {imovel.fonte}
           </p>
+          {imovel.url && (
+            <a href={imovel.url} target="_blank" rel="noopener noreferrer"
+              className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
+              Ver anúncio original ↗
+            </a>
+          )}
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold">{brl(imovel.preco)}</div>
@@ -234,6 +240,27 @@ export default function ImovelDetalhe({ params }: { params: { id: string } }) {
           </Card>
         </div>
       </div>
+
+      {d.comparaveis && (
+        <Card>
+          <CardHeader><CardTitle>Referência da região {d.comparaveis.regiao ? `· ${d.comparaveis.regiao}` : ""}</CardTitle></CardHeader>
+          <CardBody>
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+              <Stat label="R$/m² deste imóvel" value={brl(d.comparaveis.preco_m2_imovel)} />
+              <Stat label="Mediana R$/m² (venda)" value={brl(d.comparaveis.preco_m2_mediana_venda)}
+                hint={d.comparaveis.n_amostras ? `${d.comparaveis.n_amostras} anúncios` : "amostra insuficiente"} />
+              <Stat label="Desconto vs região"
+                accent={(d.comparaveis.desconto_regiao_pct ?? 0) > 0 ? "text-green-700" : "text-slate-900"}
+                value={d.comparaveis.desconto_regiao_pct != null ? pct(d.comparaveis.desconto_regiao_pct) : "—"} />
+              <Stat label="Mediana R$/m² (aluguel)" value={brl(d.comparaveis.preco_m2_mediana_aluguel)} />
+            </div>
+            <p className="mt-2 text-[11px] text-slate-400">
+              Referência = {d.comparaveis.origem}. Não são transações registradas (ITBI/cartório),
+              que não têm base pública no Brasil.
+            </p>
+          </CardBody>
+        </Card>
+      )}
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>

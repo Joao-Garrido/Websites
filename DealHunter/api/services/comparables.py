@@ -93,6 +93,28 @@ def recompute_comparavel(db: Session, bairro, cidade, uf, tipo) -> Optional[mode
         db.add(comp)
     comp.preco_m2_mediana_venda = statistics.median(precos)
     comp.n_amostras = len(precos)
+
+    # mediana de R$/m² de aluguel da região (anúncios com aluguel informado)
+    alugueis = _alugueis_m2_regiao(db, bairro, cidade, uf, tipo)
+    if alugueis:
+        comp.preco_m2_mediana_aluguel = statistics.median(alugueis)
+
     db.commit()
     db.refresh(comp)
     return comp
+
+
+def _alugueis_m2_regiao(db: Session, bairro, cidade, uf, tipo) -> List[float]:
+    stmt = select(models.Imovel).where(
+        models.Imovel.area_m2.isnot(None), models.Imovel.area_m2 > 0,
+        models.Imovel.aluguel_estimado.isnot(None), models.Imovel.aluguel_estimado > 0,
+        models.Imovel.aluguel_origem != "yield",  # evita circularidade
+        models.Imovel.arquivado.is_(False),
+    )
+    if bairro:
+        stmt = stmt.where(models.Imovel.bairro == bairro)
+    elif cidade:
+        stmt = stmt.where(models.Imovel.cidade == cidade)
+    if tipo:
+        stmt = stmt.where(models.Imovel.tipo == tipo)
+    return [im.aluguel_estimado / im.area_m2 for im in db.scalars(stmt) if im.area_m2]
