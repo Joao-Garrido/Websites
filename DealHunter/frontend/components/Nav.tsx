@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Activity, Bell, GitCompare, Home, Map, Search, Settings, Upload } from "lucide-react";
+import { Activity, Bell, Building2, GitCompare, Home, Map, Search, Settings, Upload } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { api } from "@/lib/api";
 
 const LINKS = [
   { href: "/", label: "Feed", icon: Home },
+  { href: "/morar", label: "Morar", icon: Building2 },
   { href: "/mapa", label: "Mapa", icon: Map },
   { href: "/perfis", label: "Perfis", icon: Search },
   { href: "/alertas", label: "Alertas", icon: Bell },
