@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.sqlite
+*.db
+
+# frontend
+node_modules/
+.next/
+out/
+.env.local
+npm-debug.log*
