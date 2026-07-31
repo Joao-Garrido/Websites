@@ -1,0 +1,155 @@
+import { buildTopics, type TopicSpec } from '../build'
+
+const SPECS: TopicSpec[] = [
+  [
+    'fear-beaten',
+    2,
+    'A fear you overcame',
+    [
+      'How did it start?',
+      'What was the first step you took?',
+      'How long did the whole thing take?',
+      'Is there still a trace of it?',
+    ],
+    ['fear', 'exposure', 'nerve', 'bit by bit'],
+    'Setup → Tension → Resolution',
+  ],
+  [
+    'trip',
+    1,
+    'The trip that changed you',
+    [
+      'Where was it and who with?',
+      'What was the exact moment you felt the shift?',
+      'What did you bring back that you still have?',
+      'Would you go again?',
+    ],
+    ['travel', 'perspective', 'discomfort', 'coming home'],
+    'Setup → Tension → Resolution',
+  ],
+  [
+    'lost-friendship',
+    3,
+    'A friendship that faded without a falling out',
+    [
+      'When did you notice it was over?',
+      'Was there a moment you could have done differently?',
+      'What did that person give you?',
+      'Would you get in touch today?',
+    ],
+    ['drift apart', 'silence', 'missing someone'],
+  ],
+  [
+    'quiet-pride',
+    2,
+    'Something you are proud of that nobody knows about',
+    [
+      'Why did you never tell anyone?',
+      'How much work did it take?',
+      'Who would be surprised?',
+      'Are you going to tell someone now?',
+    ],
+    ['pride', 'discretion', 'invisible effort'],
+  ],
+  [
+    'hard-decision',
+    3,
+    'The hardest decision you have made',
+    [
+      'What were the two options, concretely?',
+      'Who else was affected besides you?',
+      'How long did it take you to decide?',
+      'Would you decide the same way today?',
+    ],
+    ['dilemma', 'consequence', 'responsibility'],
+    'Setup → Options → Decision → Consequence',
+  ],
+  [
+    'brief-person',
+    2,
+    'Someone who marked you in a short space of time',
+    [
+      'How long were you actually together?',
+      'What did they say or do?',
+      'Do they know?',
+      'What of theirs do you still carry?',
+    ],
+    ['encounter', 'influence', 'brief'],
+  ],
+  [
+    'grateful-failure',
+    3,
+    'A failure you are now grateful for',
+    [
+      'What exactly failed?',
+      'When did the gratitude show up?',
+      'Are you tidying the story to make it pretty?',
+      'What would have happened if it had worked?',
+    ],
+    ['failure', 'detour', 'gratitude'],
+    'Setup → Tension → Resolution',
+  ],
+  [
+    'home',
+    2,
+    'What makes a place "home"?',
+    [
+      'Where is yours, right now?',
+      'Have you felt that somewhere you did not live?',
+      'Is it the place or the people?',
+      'Can you have more than one home?',
+    ],
+    ['belonging', 'roots', 'home'],
+  ],
+  [
+    'childhood-memory',
+    2,
+    'A childhood memory you might have invented',
+    [
+      'Tell it the way you remember it.',
+      'What makes you doubt it is real?',
+      'Does anyone in the family confirm it?',
+      'Does it matter if you invented it?',
+    ],
+    ['memory', 'narrative', 'family'],
+  ],
+  [
+    'big-change',
+    2,
+    'A big change you made by choice',
+    [
+      'What pushed you?',
+      'Who tried to talk you out of it?',
+      'What was the first month like?',
+      'What did you lose in that change?',
+    ],
+    ['transition', 'risk', 'starting over'],
+    'Setup → Tension → Resolution',
+  ],
+  [
+    'unsaid',
+    2,
+    'Something you should have said to someone and did not',
+    [
+      'To whom, and when was the window?',
+      'What stopped you?',
+      'Is it still possible to say it?',
+      'What exactly would you say, if you could now?',
+    ],
+    ['unsaid', 'nerve', 'too late'],
+  ],
+  [
+    'alone',
+    2,
+    'The difference between being alone and feeling lonely',
+    [
+      'Give me a moment when you were surrounded by people and lonely.',
+      'How much solitude do you need per week?',
+      'Has that changed with age?',
+      'What pulls you out of that feeling?',
+    ],
+    ['solitude', 'loneliness', 'company'],
+  ],
+]
+
+export default buildTopics('en', 'personal', SPECS)

@@ -1,0 +1,155 @@
+import { buildTopics, type TopicSpec } from '../build'
+
+const SPECS: TopicSpec[] = [
+  [
+    'medo-vencido',
+    2,
+    'Um medo que venceste',
+    [
+      'Como é que ele começou?',
+      'Qual foi o primeiro passo que deste?',
+      'Quanto tempo demorou ao todo?',
+      'Ainda sentes um resto dele?',
+    ],
+    ['medo', 'exposição', 'coragem', 'aos poucos'],
+    'Contexto → Tensão → Desfecho',
+  ],
+  [
+    'viagem',
+    1,
+    'A viagem que te mudou',
+    [
+      'Onde foi e com quem?',
+      'Qual foi o momento exato em que sentiste a mudança?',
+      'O que trouxeste de volta que ainda tens?',
+      'Voltarias lá?',
+    ],
+    ['viagem', 'perspetiva', 'desconforto', 'regresso'],
+    'Contexto → Tensão → Desfecho',
+  ],
+  [
+    'amizade-perdida',
+    3,
+    'Uma amizade que se perdeu sem zanga',
+    [
+      'Quando é que reparaste que tinha acabado?',
+      'Houve um momento em que podias ter feito diferente?',
+      'O que é que essa pessoa te deu?',
+      'Voltarias a contactá-la hoje?',
+    ],
+    ['afastamento', 'silêncio', 'saudade'],
+  ],
+  [
+    'orgulho',
+    2,
+    'Algo de que te orgulhas e que ninguém sabe',
+    [
+      'Porque é que nunca contaste?',
+      'Quanto trabalho é que aquilo deu?',
+      'Quem é que ficaria surpreendido?',
+      'Vais contar a alguém agora?',
+    ],
+    ['orgulho', 'discrição', 'esforço invisível'],
+  ],
+  [
+    'decisao-dificil',
+    3,
+    'A decisão mais difícil que tomaste',
+    [
+      'Quais eram as duas opções, em concreto?',
+      'Quem é que era afetado além de ti?',
+      'Quanto tempo levaste a decidir?',
+      'Tomarias a mesma decisão hoje?',
+    ],
+    ['dilema', 'consequência', 'responsabilidade'],
+    'Contexto → Opções → Decisão → Consequência',
+  ],
+  [
+    'pessoa-marcou',
+    2,
+    'Uma pessoa que te marcou em pouco tempo',
+    [
+      'Quanto tempo estiveram juntos, ao certo?',
+      'O que é que ela disse ou fez?',
+      'Ela sabe disso?',
+      'O que dela é que ainda trazes contigo?',
+    ],
+    ['encontro', 'influência', 'breve'],
+  ],
+  [
+    'fracasso',
+    3,
+    'Um fracasso de que hoje estás grato',
+    [
+      'O que é que falhou exatamente?',
+      'Quando é que a gratidão apareceu?',
+      'Não estarás a arrumar a história para ficar bonita?',
+      'O que teria acontecido se tivesse corrido bem?',
+    ],
+    ['fracasso', 'desvio', 'gratidão'],
+    'Contexto → Tensão → Desfecho',
+  ],
+  [
+    'casa',
+    2,
+    'O que faz de um sítio "casa"?',
+    [
+      'Qual é o teu, agora?',
+      'Já sentiste isso num sítio onde não vivias?',
+      'Isso é o sítio ou as pessoas?',
+      'Podes ter mais do que uma casa?',
+    ],
+    ['pertença', 'raízes', 'lar'],
+  ],
+  [
+    'infancia',
+    2,
+    'Uma memória de infância que talvez tenhas inventado',
+    [
+      'Conta-a como te lembras dela.',
+      'O que te faz duvidar de que seja real?',
+      'Alguém da família confirma?',
+      'Importa se for inventada?',
+    ],
+    ['memória', 'narrativa', 'família'],
+  ],
+  [
+    'mudanca',
+    2,
+    'Uma mudança grande que fizeste por escolha',
+    [
+      'O que é que te empurrou?',
+      'Quem te tentou demover?',
+      'Qual foi o primeiro mês?',
+      'O que perdeste nessa mudança?',
+    ],
+    ['transição', 'risco', 'recomeço'],
+    'Contexto → Tensão → Desfecho',
+  ],
+  [
+    'dizer-tarde',
+    2,
+    'Algo que devias ter dito a alguém e não disseste',
+    [
+      'A quem, e quando é que foi a janela?',
+      'O que é que te travou?',
+      'Ainda dá para dizer?',
+      'O que dirias exatamente, se pudesses agora?',
+    ],
+    ['não dito', 'coragem', 'tarde demais'],
+  ],
+  [
+    'sozinho',
+    2,
+    'A diferença entre estar sozinho e sentir-te sozinho',
+    [
+      'Dá-me um momento em que estavas rodeado de gente e sozinho.',
+      'De quanta solidão precisas por semana?',
+      'Isso mudou com a idade?',
+      'O que te tira dessa sensação?',
+    ],
+    ['solidão', 'isolamento', 'companhia'],
+  ],
+]
+
+export default buildTopics('pt', 'personal', SPECS)

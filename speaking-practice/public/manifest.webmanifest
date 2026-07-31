@@ -1,0 +1,18 @@
+{
+  "name": "Falado — prática de conversa",
+  "short_name": "Falado",
+  "description": "Pratica falar e conversar sobre temas diversos, em português e inglês.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0F0E",
+  "theme_color": "#0B0F0E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
